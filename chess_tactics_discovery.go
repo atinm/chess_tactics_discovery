@@ -45,7 +45,7 @@ import (
 )
 
 const (
-	MAX_CENTIPAWNS = 200
+	MAX_CENTIPAWNS = 300
 	MAX_MATE_IN = 5
 	MOVE_TIME = "1000"
 	MAX_DEPTH = "25"
