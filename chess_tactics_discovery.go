@@ -285,28 +285,31 @@ func main() {
 
 		if blunder > 0 {
 			// run evaluation for best move
-			bm, _, _, err := eval(fen, "")
+			bm, bmcp,bmdm, err := eval(fen, "")
 			if err != nil {
 				log.Fatal(err.Error())
 			}
-			log.Println("Inserting ", fen, sm, smcp, smdm, bm, blunder, " into database")
-		
-			res, err := stmt.Exec(fen, sm, smcp, smdm, bm, blunder)
-			if err != nil {
-				// possible duplicate
-				//log.Println(err)
-				continue
+
+			if bm != sm && ((bmcp > 0 && bmcp - smcp >= MAX_CENTIPAWNS) || (bmdm > 0 && bmdm < MAX_MATE_IN)) {
+				log.Println("Inserting ", fen, sm, smcp, smdm, bm, blunder, " into database")
+				
+				res, err := stmt.Exec(fen, sm, smcp, smdm, bm, blunder)
+				if err != nil {
+					// possible duplicate
+					//log.Println(err)
+					continue
+				}
+				lastId, err := res.LastInsertId()
+				if err != nil {
+					log.Fatal(err)
+				}
+				rowCnt, err := res.RowsAffected()
+				if err != nil {
+					log.Fatal(err)
+				}
+				
+				log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
 			}
-			lastId, err := res.LastInsertId()
-			if err != nil {
-				log.Fatal(err)
-			}
-			rowCnt, err := res.RowsAffected()
-			if err != nil {
-				log.Fatal(err)
-			}
-			
-			log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
 		}
 
 		// flip move color
