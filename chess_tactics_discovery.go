@@ -45,7 +45,8 @@ import (
 )
 
 const (
-	MAX_CENTIPAWNS = 300
+	MIN_CENTIPAWNS = 300
+	BLUNDER_CENTIPAWNS = 300
 	MAX_MATE_IN = 5
 	MOVE_TIME = "1000"
 	MAX_DEPTH = "25"
@@ -277,7 +278,7 @@ func main() {
 				// move results in checkmate in MAX_MATE_IN
 				blunder = 10000
 			}
-		} else if smcp < 0 && smcp < prevcp && prevcp - smcp >= MAX_CENTIPAWNS {
+		} else if smcp < 0 && smcp < prevcp && prevcp - smcp >= MIN_CENTIPAWNS {
 			// look for bad move by centipawns
 			blunder = prevcp - smcp
 		}
@@ -290,7 +291,7 @@ func main() {
 				log.Fatal(err.Error())
 			}
 
-			if bm != sm && ((bmcp > 0 && bmcp - smcp >= MAX_CENTIPAWNS) || (bmdm > 0 && bmdm < MAX_MATE_IN)) {
+			if bm != sm && ((bmcp - smcp >= BLUNDER_CENTIPAWNS) || (bmdm > 0 && bmdm < MAX_MATE_IN)) {
 				log.Println("Inserting ", fen, sm, smcp, smdm, bm, blunder, " into database")
 				
 				res, err := stmt.Exec(fen, sm, smcp, smdm, bm, blunder)
